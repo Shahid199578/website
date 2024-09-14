@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "hshar/webapp"
+        REPOSITORY = "https://github.com/Shahid199578/website.git"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the repository
+                git branch: "${env.BRANCH_NAME}", url: "${REPOSITORY}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Build the Docker image
+                    sh """
+                    docker build -t ${DOCKER_IMAGE} -f Dockerfile .
+                    """
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run tests (this could be replaced by real test commands)
+                    sh """
+                    echo "Running tests..."
+                    # Add actual test scripts here
+                    """
+                }
+            }
+        }
+
+        // Only deploy if we're on the master branch
+        stage('Deploy to Production') {
+            when {
+                branch 'master' // Deploy only for the master branch
+            }
+            steps {
+                script {
+                    // Deploy the Docker container
+                    sh """
+                    docker rm -f $(docker ps -a -q)
+                    docker run -d --name webapp -p 88:80 ${DOCKER_IMAGE}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup Docker images and containers to avoid resource exhaustion
+            sh """
+            docker system prune -f
+            """
+        }
+        success {
+            echo "Pipeline completed successfully"
+        }
+        failure {
+            echo "Pipeline failed"
+        }
+    }
+}
