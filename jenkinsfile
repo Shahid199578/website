@@ -31,7 +31,6 @@ pipeline {
                     // Run tests (this could be replaced by real test commands)
                 
                     echo "Running tests..."
-                    # Add actual test scripts here
                 
                 }
             }
