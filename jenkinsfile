@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the repository
-                git branch: "${env.BRANCH_NAME}", url: "${REPOSITORY}"
+                git branch: "master", url: "${REPOSITORY}"
             }
         }
 
