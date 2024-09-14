@@ -18,9 +18,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    
-                     docker.build("${DOCKER_IMAGE}", "-f .")
-                
+                    docker.build("${DOCKER_IMAGE}", "-f .")
                 }
             }
         }
@@ -29,9 +27,7 @@ pipeline {
             steps {
                 script {
                     // Run tests (this could be replaced by real test commands)
-                
                     echo "Running tests..."
-                
                 }
             }
         }
@@ -43,11 +39,11 @@ pipeline {
             }
             steps {
                 script {
-                    // Deploy the Docker container
-                 
-                    docker rm -f $(docker ps -a -q)
-                    docker run -d --name webapp -p 88:80 ${DOCKER_IMAGE}
-                 
+                    // Use shell to remove any existing containers and deploy the new Docker container
+                    sh '''
+                        docker rm -f $(docker ps -a -q || true)
+                        docker run -d --name webapp -p 88:80 ${DOCKER_IMAGE}
+                    '''
                 }
             }
         }
@@ -56,9 +52,7 @@ pipeline {
     post {
         always {
             // Cleanup Docker images and containers to avoid resource exhaustion
-          
-            docker system prune -f
-       
+            sh 'docker system prune -f'
         }
         success {
             echo "Pipeline completed successfully"
